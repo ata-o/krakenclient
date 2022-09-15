@@ -33,10 +33,10 @@ exports.post = (path: string, outages: Outage[], callback) => {
         });
 };
 
-exports.filter = (outages: Outage[], siteInfo: SiteInformation, callback) => {
-    let cutoffDate: Date = new Date('2022-01-01T00:00:00.000Z');
+exports.filter = (outages: Outage[], siteInfo: SiteInformation, cutoffDate: string, callback) => {
+    let cutoff: Date = new Date(cutoffDate);
     let outagesAfterCutoff = outages.filter(
-        (o) => new Date(o.begin) >= cutoffDate
+        (o) => new Date(o.begin) >= cutoff
     );
     let outagesWithIdPresent = outagesAfterCutoff.filter((outage) =>
         siteInfo.devices.map((device) => device.id).includes(outage.id)

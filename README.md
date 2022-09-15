@@ -16,7 +16,6 @@ install the corresponding LTS distribution of nodejs, navigate to the root of th
 
 ```
 npm install
-npm run postinstall
 ```
 
 ### build
