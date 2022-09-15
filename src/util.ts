@@ -12,6 +12,7 @@ exports.get = (path: string, callback) => {
         .get(path)
         .then((res) => {
             console.log(`${path} statusCode: ${res.status}`);
+            
             callback(res.data);
         })
         .catch((error) => {
@@ -21,11 +22,10 @@ exports.get = (path: string, callback) => {
 
 exports.post = (path: string, outages: Outage[], callback) => {
     axios
-        .post(path, 
-            outages,
-        )
+        .post(path, outages)
         .then((res) => {
-            console.log(`statusCode: ${res.status}`);
+            console.log(`${path} statusCode: ${res.status}`);
+            
             callback(res.data);
         })
         .catch((error) => {
@@ -33,15 +33,15 @@ exports.post = (path: string, outages: Outage[], callback) => {
         });
 };
 
-exports.filter = (outages: Outage[], siteInfo: SiteInformation, callback) => {
-    let cutoffDate: Date = new Date('2022-01-01T00:00:00.000Z');
+exports.filter = (outages: Outage[], siteInfo: SiteInformation, cutoffDate: string, callback) => {
+    let cutoff: Date = new Date(cutoffDate);
     let outagesAfterCutoff = outages.filter(
-        (o) => new Date(o.begin) >= cutoffDate
+        (o) => new Date(o.begin) >= cutoff
     );
     let outagesWithIdPresent = outagesAfterCutoff.filter((outage) =>
         siteInfo.devices.map((device) => device.id).includes(outage.id)
     );
-        
+
     const result: Outage[] = [];
 
     outagesWithIdPresent.forEach((outage) => {
