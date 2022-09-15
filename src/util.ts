@@ -1,7 +1,5 @@
-import Module from "module";
-
 const axios = require('axios');
-const model = require ('./model')
+const model = require('./model');
 require('dotenv').config();
 
 axios.defaults.headers.common = {
@@ -9,7 +7,7 @@ axios.defaults.headers.common = {
 };
 axios.defaults.baseURL = process.env.BASE_URL;
 
-exports.get = (path, callback) => {
+exports.get = (path: string, callback) => {
     axios
         .get(path)
         .then((res) => {
@@ -21,16 +19,40 @@ exports.get = (path, callback) => {
         });
 };
 
-exports.post = (path, outages: Outage[], callback) => {
+exports.post = (path: string, outages: Outage[], callback) => {
     axios
-        .post(path, {
-            outages
-        })
+        .post(path, 
+            outages,
+        )
         .then((res) => {
             console.log(`statusCode: ${res.status}`);
             callback(res.data);
         })
         .catch((error) => {
-            console.error(error);
+            console.error(error.code);
         });
+};
+
+exports.filter = (outages: Outage[], siteInfo: SiteInformation, callback) => {
+    let cutoffDate: Date = new Date('2022-01-01T00:00:00.000Z');
+    let outagesAfterCutoff = outages.filter(
+        (o) => new Date(o.begin) > cutoffDate
+    );
+    let outagesWithIdPresent = outagesAfterCutoff.filter((outage) =>
+        siteInfo.devices.map((device) => device.id).includes(outage.id)
+    );
+        console.log(outages);
+        console.log(siteInfo);
+        
+    const result: Outage[] = [];
+
+    outagesWithIdPresent.forEach((outage) => {
+        result.push({
+            id: outage.id,
+            name: siteInfo.devices.find((d) => d.id === outage.id).name,
+            begin: outage.begin,
+            end: outage.end,
+        });
+    });
+    callback(result);
 };
